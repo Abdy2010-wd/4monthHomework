@@ -1,0 +1,40 @@
+{% load static %}
+{% block title %}{{ book.title }} — Моя библиотека{% endblock %}
+
+{% block content %}
+  <article class="book-detail">
+    <h2>{{ book.title }}</h2>
+    <p class="author">{{ book.author }}</p>
+    <p class="rating">Средняя оценка: {{ book.rating_display }}</p>
+    <div class="description">{{ book.description|linebreaks }}</div>
+
+    <section class="reviews">
+      <h3>Отзывы ({{ reviews.count }})</h3>
+      {% for r in reviews %}
+        <div class="review">
+          <div class="meta">
+            {{ r.user.username }} — {{ r.rating }} ⭐ — {{ r.created_at|date:'SHORT_DATE_FORMAT' }}
+          </div>
+          {% if r.title %}<h4>{{ r.title }}</h4>{% endif %}
+          <p>{{ r.body|linebreaks }}</p>
+        </div>
+      {% empty %}
+        <p>Отзывов пока нет.</p>
+      {% endfor %}
+    </section>
+
+    <section class="add-review">
+      <h3>Оставить отзыв</h3>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="form-row">{{ form.user.label_tag }} {{ form.user }}</div>
+        <div class="form-row">{{ form.title.label_tag }} {{ form.title }}</div>
+        <div class="form-row">{{ form.body.label_tag }} {{ form.body }}</div>
+        <div class="form-row">{{ form.rating.label_tag }} {{ form.rating }}</div>
+        {{ form.book }}
+        <button type="submit">Отправить</button>
+      </form>
+    </section>
+  </article>
+{% endblock %}

@@ -22,22 +22,53 @@
     #     verbose_name_plural = "Книги"
     #     ordering = ['-created_at']
 
+# from django.db import models
+# from django.contrib.auth import get_user_model
+# from django.db.models import Avg
+
+# User = get_user_model()
+
+# class Book(models.Model):
+#     title = models.CharField(max_length=255)
+#     author = models.CharField(max_length=255, blank=True)
+#     description = models.TextField(blank=True)
+
+#     def __str__(self):
+#         return self.title
+
+#     def average_rating(self):
+#         agg = self.reviews.aggregate(avg=Avg('rating'))
+#         return agg['avg']
+
+#     def rating_display(self):
+#         avg = self.average_rating()
+#         return round(avg, 2) if avg is not None else '—'
+
+
+# class Review(models.Model):
+#     RATING_CHOICES = [(i, str(i)) for i in range(1, 6)]
+
+#     book = models.ForeignKey(Book, related_name='reviews', on_delete=models.CASCADE)
+#     user = models.ForeignKey(User, related_name='reviews', on_delete=models.CASCADE)
+#     title = models.CharField(max_length=200, blank=True)
+#     body = models.TextField()
+#     rating = models.PositiveSmallIntegerField(choices=RATING_CHOICES)
+#     created_at = models.DateTimeField(auto_now_add=True)
+
+#     class Meta:
+#         ordering = ['-created_at']
+
+#     def __str__(self):
+#         return f"{self.book.title} — {self.user.username} ({self.rating})"
+
 from django.db import models
-from django.contrib.auth.models import User
 
 class Book(models.Model):
-    title = models.CharField("Название книги", max_length=200)
-    author = models.CharField("Автор", max_length=100)
-    rating = models.FloatField("Средний рейтинг", default=0)
+    title = models.CharField(max_length=200, null=True, blank=True)
+    author = models.CharField(max_length=100, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    published_year = models.IntegerField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     def __str__(self):
         return self.title
-
-class Review(models.Model):
-    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='reviews')
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    text = models.TextField("Отзыв")
-    rating = models.IntegerField("Оценка", default=0)
-
-    def __str__(self):
-        return f"{self.user.username} - {self.book.title}"
