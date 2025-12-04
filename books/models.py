@@ -62,13 +62,32 @@
 #         return f"{self.book.title} — {self.user.username} ({self.rating})"
 
 from django.db import models
+from django.core.exceptions import ValidationError
 
 class Book(models.Model):
     title = models.CharField(max_length=200, null=True, blank=True)
     author = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     published_year = models.IntegerField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.title
+        return self.title or "Без названия"
+
+
+class Review(models.Model):
+    book = models.ForeignKey(
+        Book,  # просто используем имя класса
+        on_delete=models.CASCADE,
+        related_name="reviews"
+    )
+    rating = models.IntegerField()
+    body = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def clean(self):
+        if not 1 <= self.rating <= 5:
+            raise ValidationError("Ставьте оценку только от 1 до 5")
+
+    def __str__(self):
+        return f"{self.book.title} — {self.rating}⭐"

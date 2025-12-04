@@ -1,59 +1,13 @@
-/* Общие стили */
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f5f5f5;
-}
-
-header {
-    background-color: #4CAF50;
-    color: white;
-    padding: 15px;
-    text-align: center;
-}
-
-header nav a {
-    color: white;
-    margin: 0 10px;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-header nav a:hover {
-    text-decoration: underline;
-}
-
-footer {
-    background-color: #333;
-    color: white;
-    padding: 10px;
-    text-align: center;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-}
-
-main {
-    padding: 20px;
-}
-
-/* Стили для книг */
-.book {
-    background-color: white;
-    border-radius: 5px;
-    padding: 15px;
-    margin-bottom: 15px;
-    box-shadow: 0 0 5px rgba(0,0,0,0.1);
-}
-
-.book h2 {
-    margin-top: 0;
-}
-
-.review {
-    margin-top: 10px;
-    padding-left: 10px;
-    border-left: 2px solid #4CAF50;
-    font-style: italic;
-}
+:root{--wrap:1100px;--accent:#2563eb}
+body{font-family: Inter, Arial, sans-serif;margin:0;color:#111}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 16px}
+.site-header{background:#f8fafc;padding:18px 0;border-bottom:1px solid #e6edf3}
+.brand a{text-decoration:none;color:var(--accent);font-weight:700}
+.main-nav a{margin-left:18px;text-decoration:none;color:#334155}
+.container{padding:28px 0}
+.book-detail h2{margin-top:0}
+.reviews .review{border-top:1px solid #e6edf3;padding:12px 0}
+.add-review form{margin-top:20px}
+.form-row{margin-bottom:10px}
+button{background:var(--accent);color:#fff;padding:8px 12px;border:none;border-radius:6px}
+.site-footer{background:#0f172a;color:#fff;padding:18px 0;margin-top:40px}

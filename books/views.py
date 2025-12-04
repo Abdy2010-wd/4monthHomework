@@ -46,8 +46,9 @@
 
 
 
-from django.shortcuts import render, get_object_or_404
-from .models import Book
+from django.shortcuts import render, get_object_or_404, redirect
+from django.core.exceptions import ValidationError
+from .models import Book, Review
 
 def book_list(request):
     books = Book.objects.all()
@@ -55,4 +56,25 @@ def book_list(request):
 
 def book_detail(request, pk):
     book = get_object_or_404(Book, pk=pk)
-    return render(request, "books/book_detail.html", {"book": book})
+    reviews = book.reviews.all()  # связанные отзывы
+
+    if request.method == "POST":
+        try:
+            rating = int(request.POST.get("rating"))
+            body = request.POST.get("body", "")
+            
+            review = Review(book=book, rating=rating, body=body)
+            review.clean()  # проверка 1–5
+            review.save()
+            return redirect("book_detail", pk=pk)
+        except (ValidationError, ValueError):
+            return render(request, "books/book_detail.html", {
+                "book": book,
+                "reviews": reviews,
+                "error": "Ставьте оценку только от 1 до 5"
+            })
+
+    return render(request, "books/book_detail.html", {
+        "book": book,
+        "reviews": reviews
+    })

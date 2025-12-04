@@ -1,10 +1,30 @@
+{% include "header.html" %}
 <header class="site-header">
   <div class="wrap">
     <h1 class="brand"><a href="/">Моя библиотека</a></h1>
     <nav class="main-nav">
-      <a href="/">Книги</a>
+      <a href="/books/">Книги</a>
       <a href="/about/">О проекте</a>
     </nav>
   </div>
 </header>
 
+<style>
+.site-header {
+    background: #222;
+    padding: 15px 0;
+    color: #fff;
+}
+.site-header .wrap {
+    width: 90%;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.site-header a {
+    color: #fff;
+    margin-left: 20px;
+    text-decoration: none;
+}
+</style>
