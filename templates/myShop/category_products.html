@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Продукты категории {{ category.name }}</title>
+</head>
+<body>
+  <h1>Категория: {{ category.name }}</h1>
+
+  <ul>
+    {% for p in products %}
+      <li>
+        <strong>{{ p.name }}</strong> — {{ p.price }}
+      </li>
+    {% empty %}
+      <li>В этой категории пока нет продуктов.</li>
+    {% endfor %}
+  </ul>
+
+  <p><a href="{% url 'myShop:categories_list' %}">Назад к категориям</a></p>
+  <p><a href="{% url 'myShop:products_list' %}">Показать все продукты</a></p>
+</body>
+</html>

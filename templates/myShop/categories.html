@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Категории</title>
+</head>
+<body>
+  <h1>Список категорий</h1>
+
+  <ul>
+    {% for cat in categories %}
+      <li>
+        <a href="{% url 'myShop:category_products' cat.id %}">{{ cat.name }}</a>
+      </li>
+    {% empty %}
+      <li>Категорий пока нет.</li>
+    {% endfor %}
+  </ul>
+
+  <p><a href="{% url 'myShop:products_list' %}">Показать все продукты</a></p>
+</body>
+</html>
