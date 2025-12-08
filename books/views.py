@@ -45,18 +45,58 @@
 #     return render(request, 'books/book_detail.html', {'book': book})
 
 
-
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.exceptions import ValidationError
 from .models import Book, Review
+
 
 def book_list(request):
     books = Book.objects.all()
     return render(request, "books/book_list.html", {"books": books})
 
+def book_create(request):
+    if request.method == "POST":
+        title = request.POST.get("title")
+        author = request.POST.get("author")
+        description = request.POST.get("description")
+        published_year = request.POST.get("published_year")
+
+        Book.objects.create(
+            title=title,
+            author=author,
+            description=description,
+            published_year=published_year
+        )
+        return redirect("book_list")
+
+    return render(request, "books/book_form.html")
+
+
+def book_update(request, pk):
+    book = get_object_or_404(Book, pk=pk)
+
+    if request.method == "POST":
+        book.title = request.POST.get("title")
+        book.author = request.POST.get("author")
+        book.description = request.POST.get("description")
+        book.published_year = request.POST.get("published_year")
+        book.save()
+
+        return redirect("book_detail", pk=book.pk)
+
+    return render(request, "books/book_form.html", {"book": book})
+
+
+
+def book_delete(request, pk):
+    book = get_object_or_404(Book, pk=pk)
+    book.delete()
+    return redirect("book_list")
+ 
+
 def book_detail(request, pk):
     book = get_object_or_404(Book, pk=pk)
-    reviews = book.reviews.all()  # связанные отзывы
+    reviews = book.reviews.all()
 
     if request.method == "POST":
         try:
@@ -64,9 +104,10 @@ def book_detail(request, pk):
             body = request.POST.get("body", "")
             
             review = Review(book=book, rating=rating, body=body)
-            review.clean()  # проверка 1–5
+            review.clean()
             review.save()
             return redirect("book_detail", pk=pk)
+
         except (ValidationError, ValueError):
             return render(request, "books/book_detail.html", {
                 "book": book,

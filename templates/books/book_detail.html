@@ -1,5 +1,46 @@
 {% include "header.html" %}
 
+<h1>{{ book.title }}</h1>
+
+
+<a href="{% url 'book_update' book.pk %}">Редактировать</a> |
+<a href="{% url 'book_delete' book.pk %}">Удалить</a>
+
+<hr>
+
+<p><strong>Автор:</strong> {{ book.author }}</p>
+<p><strong>Описание:</strong> {{ book.description }}</p>
+<p><strong>Год:</strong> {{ book.published_year }}</p>
+
+<hr>
+
+<h2>Отзывы</h2>
+
+{% if error %}
+    <p style="color:red;">{{ error }}</p>
+{% endif %}
+
+<ul>
+    {% for review in reviews %}
+        <li>{{ review.rating }}⭐ — {{ review.body }}</li>
+    {% endfor %}
+</ul>
+
+<hr>
+
+<h3>Добавить отзыв</h3>
+<form method="POST">
+    {% csrf_token %}
+    <label>Оценка (1–5):</label>
+    <input type="number" name="rating">
+
+    <label>Текст:</label>
+    <textarea name="body"></textarea>
+
+    <button type="submit">Отправить</button>
+</form>
+
+
 <h2>{{ book.title }}</h2>
 <p><strong>Автор:</strong> {{ book.author }}</p>
 <p><strong>Описание:</strong><br> {{ book.description }}</p>
