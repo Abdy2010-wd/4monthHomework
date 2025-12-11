@@ -1,0 +1,9 @@
+<h1>Все зарегистрированные люди</h1>
+
+<ul>
+    {% for p in people %}
+        <li>
+            <strong>{{ p.full_name }}</strong> — {{ p.desired_position }}
+        </li>
+    {% endfor %}
+ </ul>
