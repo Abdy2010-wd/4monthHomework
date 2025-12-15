@@ -1,0 +1,29 @@
+{% include "header.html" %}
+
+<h1>Добавить паспорт</h1>
+<form method="post">
+    {% csrf_token %}
+    <label>Имя пользователя:</label>
+    <input type="text" name="username"><br>
+
+    <label>Номер паспорта:</label>
+    <input type="text" name="passport_number"><br>
+
+    <label>Дата выдачи:</label>
+    <input type="date" name="issue_date"><br>
+
+    <label>Дата окончания:</label>
+    <input type="date" name="expiry_date"><br>
+
+    <label>Место рождения:</label>
+    <input type="text" name="birth_place"><br>
+
+    <label>Национальность:</label>
+    <input type="text" name="nationality"><br>
+
+    <button type="submit">Сохранить</button>
+</form>
+
+<a href="{% url 'passport_list' %}">Назад к списку</a>
+
+{% include "footer.html" %}

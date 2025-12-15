@@ -47,12 +47,32 @@
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator
+from django.db.models import Q
 from .models import Book, Review
-
 
 def book_list(request):
     books = Book.objects.all()
-    return render(request, "books/book_list.html", {"books": books})
+    paginator = Paginator(books, 5)  # 5 книг на странице
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    return render(request, "books/book_list.html", {"page_obj": page_obj})
+
+def book_search(request):
+    query = request.GET.get("q")
+    if query:
+        books = Book.objects.filter(
+            Q(title__icontains=query) | Q(author__icontains=query)
+        )
+    else:
+        books = Book.objects.all()
+
+    paginator = Paginator(books, 5)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, "books/book_list.html", {"page_obj": page_obj, "query": query})
+
 
 def book_create(request):
     if request.method == "POST":
@@ -86,13 +106,10 @@ def book_update(request, pk):
 
     return render(request, "books/book_form.html", {"book": book})
 
-
-
 def book_delete(request, pk):
     book = get_object_or_404(Book, pk=pk)
     book.delete()
     return redirect("book_list")
- 
 
 def book_detail(request, pk):
     book = get_object_or_404(Book, pk=pk)
@@ -102,9 +119,9 @@ def book_detail(request, pk):
         try:
             rating = int(request.POST.get("rating"))
             body = request.POST.get("body", "")
-            
+
             review = Review(book=book, rating=rating, body=body)
-            review.clean()
+            review.clean()  # проверка рейтинга 1–5
             review.save()
             return redirect("book_detail", pk=pk)
 

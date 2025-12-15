@@ -1,0 +1,13 @@
+{% include "header.html" %}
+
+<h1>Список паспортов</h1>
+
+<ul>
+    {% for p in passports %}
+        <li>{{ p.user.username }} — {{ p.passport_number }} — {{ p.birth_place }}</li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'passport_create' %}">Добавить новый паспорт</a>
+
+{% include "footer.html" %}

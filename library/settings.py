@@ -30,6 +30,8 @@ INSTALLED_APPS = [
     'myShop',
     'accounts',
     'captcha',
+    'clothes',
+    'passport',
 ]
 
 MIDDLEWARE = [

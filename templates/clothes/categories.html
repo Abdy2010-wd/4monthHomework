@@ -1,0 +1,13 @@
+{% include "header.html" %}
+
+<h1>Категории одежды</h1>
+
+<ul>
+    {% for category in categories %}
+        <li>
+            <a href="{% url 'clothes_by_category' category.id %}">{{ category.name }}</a>
+        </li>
+    {% endfor %}
+</ul>
+
+{% include "footer.html" %}

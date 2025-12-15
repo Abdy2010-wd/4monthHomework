@@ -2,17 +2,37 @@
 
 <h1>Список книг</h1>
 
+<form method="get" action="{% url 'book_list' %}">
+    <input type="text" name="q" placeholder="Поиск по названию или автору" value="{{ query|default_if_none:'' }}">
+    <button type="submit">Найти</button>
+</form>
+
 <a href="{% url 'book_create' %}">Добавить книгу</a>
 
 <ul>
-    {% for book in books %}
+    {% for book in page_obj %}
         <li>
             <a href="{% url 'book_detail' book.pk %}">{{ book.title }}</a>
             — <a href="{% url 'book_update' book.pk %}">Редактировать</a>
             — <a href="{% url 'book_delete' book.pk %}">Удалить</a>
         </li>
+    {% empty %}
+        <li>Книги не найдены.</li>
     {% endfor %}
 </ul>
 
+<!-- Пагинация -->
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?{% if query %}q={{ query }}&{% endif %}page={{ page_obj.previous_page_number }}">« Назад</a>
+    {% endif %}
+
+    <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+
+    {% if page_obj.has_next %}
+        <a href="?{% if query %}q={{ query }}&{% endif %}page={{ page_obj.next_page_number }}">Вперед »</a>
+    {% endif %}
+</div>
 
 {% include "footer.html" %}
+
