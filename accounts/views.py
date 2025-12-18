@@ -1,44 +1,35 @@
-from django.shortcuts import render, redirect
+from django.views.generic import CreateView, FormView, ListView
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
 
 from .forms import ApplicationForm, LoginForm
 from .models import Application
 
 
-def register_view(request):
-    if request.method == "POST":
-        form = ApplicationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect("login")
-    else:
-        form = ApplicationForm()
-
-    return render(request, "accounts/register.html", {"form": form})
+class RegisterView(CreateView):
+    form_class = ApplicationForm
+    template_name = "accounts/register.html"
+    success_url = reverse_lazy("login")
 
 
-def login_view(request):
-    if request.method == "POST":
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            user = authenticate(
-                request,
-                username=form.cleaned_data["username"],
-                password=form.cleaned_data["password"]
-            )
-            if user:
-                login(request, user)
-                return redirect("all_people")
+class LoginView(FormView):
+    form_class = LoginForm
+    template_name = "accounts/login.html"
+    success_url = reverse_lazy("all_people")
 
-    else:
-        form = LoginForm()
-
-    return render(request, "accounts/login.html", {"form": form})
+    def form_valid(self, form):
+        user = authenticate(
+            self.request,
+            username=form.cleaned_data["username"],
+            password=form.cleaned_data["password"]
+        )
+        if user:
+            login(self.request, user)
+        return super().form_valid(form)
 
 
-@login_required
-def all_people(request):
-    people = Application.objects.all()
-    return render(request, "accounts/people.html", {"people": people})
-
+class AllPeopleView(LoginRequiredMixin, ListView):
+    model = Application
+    template_name = "accounts/people.html"
+    context_object_name = "people"

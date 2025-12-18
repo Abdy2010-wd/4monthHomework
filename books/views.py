@@ -45,94 +45,86 @@
 #     return render(request, 'books/book_detail.html', {'book': book})
 
 
-from django.shortcuts import render, get_object_or_404, redirect
+from django.views.generic import (
+    ListView, DetailView, CreateView, UpdateView, DeleteView
+)
+from django.urls import reverse_lazy
 from django.core.exceptions import ValidationError
-from django.core.paginator import Paginator
 from django.db.models import Q
+
 from .models import Book, Review
 
-def book_list(request):
-    books = Book.objects.all()
-    paginator = Paginator(books, 5)  # 5 книг на странице
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
-    return render(request, "books/book_list.html", {"page_obj": page_obj})
 
-def book_search(request):
-    query = request.GET.get("q")
-    if query:
-        books = Book.objects.filter(
-            Q(title__icontains=query) | Q(author__icontains=query)
-        )
-    else:
-        books = Book.objects.all()
-
-    paginator = Paginator(books, 5)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
-
-    return render(request, "books/book_list.html", {"page_obj": page_obj, "query": query})
+class BookListView(ListView):
+    model = Book
+    template_name = "books/book_list.html"
+    context_object_name = "page_obj"
+    paginate_by = 5
 
 
-def book_create(request):
-    if request.method == "POST":
-        title = request.POST.get("title")
-        author = request.POST.get("author")
-        description = request.POST.get("description")
-        published_year = request.POST.get("published_year")
+class BookSearchView(ListView):
+    model = Book
+    template_name = "books/book_list.html"
+    context_object_name = "page_obj"
+    paginate_by = 5
 
-        Book.objects.create(
-            title=title,
-            author=author,
-            description=description,
-            published_year=published_year
-        )
-        return redirect("book_list")
+    def get_queryset(self):
+        query = self.request.GET.get("q")
+        if query:
+            return Book.objects.filter(
+                Q(title__icontains=query) | Q(author__icontains=query)
+            )
+        return Book.objects.all()
 
-    return render(request, "books/book_form.html")
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["query"] = self.request.GET.get("q", "")
+        return context
 
 
-def book_update(request, pk):
-    book = get_object_or_404(Book, pk=pk)
+class BookCreateView(CreateView):
+    model = Book
+    fields = ["title", "author", "description", "published_year"]
+    template_name = "books/book_form.html"
+    success_url = reverse_lazy("book_list")
 
-    if request.method == "POST":
-        book.title = request.POST.get("title")
-        book.author = request.POST.get("author")
-        book.description = request.POST.get("description")
-        book.published_year = request.POST.get("published_year")
-        book.save()
 
-        return redirect("book_detail", pk=book.pk)
+class BookUpdateView(UpdateView):
+    model = Book
+    fields = ["title", "author", "description", "published_year"]
+    template_name = "books/book_form.html"
 
-    return render(request, "books/book_form.html", {"book": book})
+    def get_success_url(self):
+        return reverse_lazy("book_detail", kwargs={"pk": self.object.pk})
 
-def book_delete(request, pk):
-    book = get_object_or_404(Book, pk=pk)
-    book.delete()
-    return redirect("book_list")
 
-def book_detail(request, pk):
-    book = get_object_or_404(Book, pk=pk)
-    reviews = book.reviews.all()
+class BookDeleteView(DeleteView):
+    model = Book
+    success_url = reverse_lazy("book_list")
 
-    if request.method == "POST":
+
+class BookDetailView(DetailView):
+    model = Book
+    template_name = "books/book_detail.html"
+    context_object_name = "book"
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
         try:
             rating = int(request.POST.get("rating"))
             body = request.POST.get("body", "")
 
-            review = Review(book=book, rating=rating, body=body)
-            review.clean()  # проверка рейтинга 1–5
+            review = Review(book=self.object, rating=rating, body=body)
+            review.clean()
             review.save()
-            return redirect("book_detail", pk=pk)
 
         except (ValidationError, ValueError):
-            return render(request, "books/book_detail.html", {
-                "book": book,
-                "reviews": reviews,
-                "error": "Ставьте оценку только от 1 до 5"
-            })
+            return self.get(request, error="Ставьте оценку только от 1 до 5")
 
-    return render(request, "books/book_detail.html", {
-        "book": book,
-        "reviews": reviews
-    })
+        return self.get(request)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["reviews"] = self.object.reviews.all()
+        context["error"] = kwargs.get("error")
+        return context

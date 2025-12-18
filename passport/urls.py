@@ -1,7 +1,8 @@
 from django.urls import path
-from . import views
+from .views import PassportCreateView, PassportListView
 
 urlpatterns = [
-    path("create/", views.passport_create, name="passport_create"),
-    path("", views.passport_list, name="passport_list"),
+    path("", PassportListView.as_view(), name="passport_list"),
+    path("create/", PassportCreateView.as_view(), name="passport_create"),
 ]
+

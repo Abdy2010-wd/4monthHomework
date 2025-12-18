@@ -1,29 +1,30 @@
-# passport/views.py
-from django.shortcuts import render, redirect
-from .models import Passport
+from django.views.generic import CreateView, ListView
+from django.urls import reverse_lazy
 from django.contrib.auth.models import User
 
-def passport_create(request):
-    if request.method == "POST":
-        username = request.POST.get("username")
-        passport_number = request.POST.get("passport_number")
-        issue_date = request.POST.get("issue_date")
-        expiry_date = request.POST.get("expiry_date")
-        birth_place = request.POST.get("birth_place")
-        nationality = request.POST.get("nationality")
+from .models import Passport
 
+
+class PassportCreateView(CreateView):
+    model = Passport
+    fields = [
+        "passport_number",
+        "issue_date",
+        "expiry_date",
+        "birth_place",
+        "nationality",
+    ]
+    template_name = "passport/passport_form.html"
+    success_url = reverse_lazy("passport_list")
+
+    def form_valid(self, form):
+        username = self.request.POST.get("username")
         user, created = User.objects.get_or_create(username=username)
-        Passport.objects.create(
-            user=user,
-            passport_number=passport_number,
-            issue_date=issue_date,
-            expiry_date=expiry_date,
-            birth_place=birth_place,
-            nationality=nationality
-        )
-        return redirect("passport_list")
-    return render(request, "passport/passport_form.html")
+        form.instance.user = user
+        return super().form_valid(form)
 
-def passport_list(request):
-    passports = Passport.objects.all()
-    return render(request, "passport/passport_list.html", {"passports": passports})
+
+class PassportListView(ListView):
+    model = Passport
+    template_name = "passport/passport_list.html"
+    context_object_name = "passports"
