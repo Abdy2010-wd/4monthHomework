@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ movie.title }}</h1>
+
+<p>{{ movie.description }}</p>
+<p>📅 Дата выхода: {{ movie.release_date }}</p>
+
+<p>
+    🎭 Жанры:
+    {% for g in movie.genre.all %}
+        #{{ g.name }}
+    {% endfor %}
+</p>
+
+<p>⭐ Средний рейтинг: {{ movie.average_rating }}</p>
+
+<a href="{% url 'movie_list' %}">⬅ Назад</a>
+
+{% if user == movie.created_by %}
+    | <a href="{% url 'movie_edit' movie.pk %}">✏️ Изменить</a>
+    | <a href="{% url 'movie_delete' movie.pk %}">🗑 Удалить</a>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,8 @@
+{% if user.is_authenticated %}
+    <span>Привет, {{ user.username }}</span>
+    <a href="{% url 'logout' %}">Выйти</a>
+{% else %}
+    <a href="{% url 'login' %}">Войти</a>
+    <a href="{% url 'signup' %}">Регистрация</a>
+{% endif %}
+

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>🎬 Список фильмов</h1>
+
+<form method="get">
+    <input type="text" name="q" placeholder="Поиск по названию">
+    
+    <select name="genre">
+        <option value="">Все жанры</option>
+        {% for g in genres %}
+            <option value="{{ g.id }}">{{ g.name }}</option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Поиск</button>
+</form>
+
+<br>
+
+{% if user.is_authenticated %}
+    <a href="{% url 'movie_add' %}">➕ Добавить фильм</a>
+{% endif %}
+
+<hr>
+
+{% for movie in movies %}
+    <h3>{{ movie.title }}</h3>
+    <p>⭐ Средний рейтинг: {{ movie.average_rating }}</p>
+
+    <a href="{% url 'movie_detail' movie.pk %}">Подробнее</a>
+
+    {% if user == movie.created_by %}
+        | <a href="{% url 'movie_edit' movie.pk %}">✏️ Изменить</a>
+        | <a href="{% url 'movie_delete' movie.pk %}">🗑 Удалить</a>
+    {% endif %}
+
+    <hr>
+{% empty %}
+    <p>Фильмов нет</p>
+{% endfor %}
+
+{% endblock %}
